@@ -167,7 +167,7 @@ class KLGA {
 	}
 	
 /**
-	 * KL repurpose - Parses and returns the Analytics Reporting API V4 response.
+	 * KL repurpose - Parses and returns a simplified result array from the Analytics Reporting API V4 response.
 	 *
 	 * @param An Analytics Reporting API V4 response.
 	 */
@@ -226,7 +226,39 @@ class KLGA {
 		}
 		return $results;
 	}
+	
+	/* helpers */
+	public static function isComplexAnalytic($results) {
+		return count($results) > 1; // || isset($result['dimension'])
+	}
+	public static function isSimpleAnalytic($results) {
+		return !self::isComplexAnalytic($results);
+	}
+	/* return rudimentary html for complex analytics results table */
+	public static function htmlTable($results) {		
+		$html = '<table>';
+		$html .= '<thead>';
+		$html .= '<tr>';
+		$html .= '<th>'.'value'.'</th>'; // todo
+		$html .= '<th>'.$results[0]['name'].'</th>';
+		$html .= '</tr>';
+		$html .= '</thead>';
 		
+		$html .= '<tbody>';
+		foreach ($results as $result) {
+			//echo $result['dimension'].': '.$result['values'].' '.$result['name'];
+			$html .= '<tr>';
+			$html .= '<td>'.$result['dimension'].'</td>';
+			$html .= '<td>'.$result['values'].'</td>';
+			$html .= '</tr>';
+		}
+		$html .= '<tbody>';
+		$html .= '</table>';
+		
+		return $html;
+	}
+		
+	/* main convenience function */
 	public static function getGA($start, $end, $pageSize, $metric, $dimension = null) {
 		if (!self::$ganalytics) { self::$ganalytics = self::initializeAnalytics(); }
 		$response = self::getReport(self::$ganalytics, $start, $end, $pageSize, $metric, $dimension);		
@@ -290,19 +322,19 @@ class KLGA {
 				
 		$analytics = array(
 			array ('metric' => "visits"), // || "sessions"
-			//array ('metric' => "users"),
-			//array ('metric' => "pageviews"),
-			//array ('metric' => "avgSessionDuration"), /* in seconds, converts to H:i:s */
-			//array ('metric' => "bounceRate"),
+			array ('metric' => "users"),
+			array ('metric' => "pageviews"),
+			array ('metric' => "avgSessionDuration"), /* in seconds, converts to H:i:s */
+			array ('metric' => "bounceRate"),
+			array ('metric' => "pageviewsPerSession"), 
 			
 			array ('metric' => "pageviews", 'dimension' => 'source'), // 'dimension' => 'fullReferrer' gives full referrer URL 
-			/*
 			array ('metric' => "pageviews", 'dimension' => 'country'),
 			array ('metric' => "pageviews", 'dimension' => 'keyword'),
 			array ('metric' => "pageviews", 'dimension' => 'pagePath'),
-			* */
 		);
 		
+		// loop thorugh all analytics, get using getGA() and display	
 		foreach ($analytics as $analytic) {
 			$response = self::getGA($_POST['klga_start'], $_POST['klga_end'],(int) $_POST['klga_limit'],$analytic['metric'],isset($analytic['dimension'])?$analytic['dimension']:null);
 			echo '<h4>';
@@ -310,20 +342,26 @@ class KLGA {
 			if (isset($analytic['dimension'])) { echo ' x '.$analytic['dimension']; }
 			echo ':</h4>';
 			//self::printResults($response);
+			// parse simplified result array from response
 			$results = self::getResults($response);
-			foreach ($results as $result) {
-				if (isset($result['dimension'])) { // complex analytic
-					echo $result['dimension'].': '.$result['values'].' '.$result['name'];
-				} else {
-					echo $results[0]['values']; // simple analytics
-				}
+			
+			if (self::isSimpleAnalytic($results)) {
+				echo $results[0]['values'];
 				echo '<br/>';
+			} else {								
+				/*
+				foreach ($results as $result) {
+					echo $result['dimension'].': '.$result['values'].' '.$result['name'];
+					echo '<br/>';
+				}
+				*/
+				echo self::htmlTable($results);
 			}
-			echo '<br/>';
-		}		
+			echo '<br/>';			
+		}
 		
-	}	
-
+	}
+		
 }
 
 add_shortcode('klgas','KLGA::klgas');
