@@ -42,10 +42,12 @@ class KLGA {
 	  // credentials in JSON format. Place them in this directory or
 	  // change the key file location if necessary.	  
 	  $KEY_FILE_LOCATION = "";
-	  if (substr(get_option('kl_ga_DeveloperKeyFileLocation'),0,1) != "/") {
+	  if (substr(get_option('kl_ga_DeveloperKeyFileLocation'),0,1) != "/"
+		&& substr(get_option('kl_ga_DeveloperKeyFileLocation'),0,4) != "http") {
 		$KEY_FILE_LOCATION = __DIR__ .'/';
 	  }
-	  $KEY_FILE_LOCATION .= get_option('kl_ga_DeveloperKeyFileLocation');	  
+	  $KEY_FILE_LOCATION .= get_option('kl_ga_DeveloperKeyFileLocation');	
+	  echo "=".  $KEY_FILE_LOCATION;	
 
 	  // Create and configure a new client object.
 	  $client = new Google_Client();

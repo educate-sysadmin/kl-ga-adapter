@@ -17,6 +17,7 @@ function kl_ga_plugin_create_menu() {
 }
 
 function register_kl_ga_plugin_settings() {	
+	register_setting( 'kl_ga-plugin-settings-group', 'kl_ga_use_bundled_gaapi' );
 	register_setting( 'kl_ga-plugin-settings-group', 'kl_ga_ApplicationName' );
 	//register_setting( 'kl_ga-plugin-settings-group', 'kl_ga_DeveloperKey' );
 	register_setting( 'kl_ga-plugin-settings-group', 'kl_ga_DeveloperKeyFileLocation' );
