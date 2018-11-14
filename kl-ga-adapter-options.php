@@ -40,6 +40,15 @@ function kl_ga_plugin_settings_page() {
         	<br/>
         	<small>ApplicationName for GA API</small>
         </td>
+        </tr>            
+            
+		<tr valign="top">
+        <th scope="row">ApplicationName</th>
+        <td>
+        	<input type="input" name="kl_ga_ApplicationName" value="<?php echo get_option('kl_ga_ApplicationName'); ?>" size="60" />
+        	<br/>
+        	<small>ApplicationName for GA API</small>
+        </td>
         </tr>
         
 		<tr valign="top">
@@ -66,13 +75,14 @@ function kl_ga_plugin_settings_page() {
     
 </form>
 
+<?php /* can't test without settings already entered
 <div id = "kl-ga-test">
 	<h1>Status/Test</h1>
 	<?php
 		echo KLGA::test()?"Ok":"Problem";
 	?>
-
 </div>
+* */ ?>
 
 </div>
 <?php } ?>
