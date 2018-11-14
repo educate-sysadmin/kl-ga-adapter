@@ -40,9 +40,9 @@ class KLGA {
 	  $client->setApplicationName(get_option('kl_ga_ApplicationName'));
 	  $client->setAuthConfig($KEY_FILE_LOCATION);
 	  $client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
-	  $analytics = new Google_Service_AnalyticsReporting($client);
+	  $ganalytics = new Google_Service_AnalyticsReporting($client);
 
-	  return $analytics;
+	  return $ganalytics;
 	}
 
 
@@ -215,7 +215,7 @@ class KLGA {
 	}	
 	
 	/* KL use */
-	public static $analytics = null; // GA service object
+	public static $ganalytics = null; // GA service object
 	
 	/* Optional KL-specific fixes for result values */
 	public static function KLfilter($results) {		
@@ -228,15 +228,15 @@ class KLGA {
 	}
 		
 	public static function getGA($start, $end, $metric, $dimension = null) {
-		if (!self::$analytics) { self::$analytics = self::initializeAnalytics(); }
-		$response = self::getReport(self::$analytics, $start, $end, $metric, $dimension);		
+		if (!self::$ganalytics) { self::$ganalytics = self::initializeAnalytics(); }
+		$response = self::getReport(self::$ganalytics, $start, $end, $metric, $dimension);		
 		return $response;
 	}
 	
 	/* basic test of status */
 	public static function test() {
-		if (!self::$analytics) { self::$analytics = self::initializeAnalytics(); }		
-		return self::$analytics && get_class(self::$analytics) == "Google_Service_AnalyticsReporting";
+		if (!self::$ganalytics) { self::$ganalytics = self::initializeAnalytics(); }		
+		return self::$ganalytics && get_class(self::$ganalytics) == "Google_Service_AnalyticsReporting";
 	}
 	
 	/* basic sample of KLGA metrics via shortcode */
@@ -245,15 +245,7 @@ class KLGA {
 		/* Ref: https://gist.github.com/denisyukphp/6fcb94a5582f333a16f9d53e4f278168 */
 		
 		// TODO: date filter, limit
-		
-		$simplemetrics = array(
-			"visits" /* || "sessions" */, 
-			"users", 
-			"pageviews", 
-			"avgSessionDuration", 
-			"bounceRate",
-		);
-		
+				
 		$analytics = array(
 			array ('metric' => "visits"), /* || "sessions" */
 			array ('metric' => "users"),
