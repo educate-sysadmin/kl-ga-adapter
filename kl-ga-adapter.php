@@ -83,9 +83,9 @@ class KLGA {
 		$analytics, 
 		$start, 
 		$end, 
+		$pageSize = 20,
 		$metric, 
-		$dimension = null, 
-		$pageSize = 20, 
+		$dimension = null, 		
 		$order = null /* currently default pageviews desc ordering only */
 	) {
 		
@@ -227,9 +227,9 @@ class KLGA {
 		return $results;
 	}
 		
-	public static function getGA($start, $end, $metric, $dimension = null) {
+	public static function getGA($start, $end, $pageSize, $metric, $dimension = null) {
 		if (!self::$ganalytics) { self::$ganalytics = self::initializeAnalytics(); }
-		$response = self::getReport(self::$ganalytics, $start, $end, $metric, $dimension);		
+		$response = self::getReport(self::$ganalytics, $start, $end, $pageSize, $metric, $dimension);		
 		return $response;
 	}
 	
@@ -244,21 +244,67 @@ class KLGA {
 		/* Ref: https://developers.google.com/analytics/devguides/reporting/core/dimsmets#cats=user,session */		
 		/* Ref: https://gist.github.com/denisyukphp/6fcb94a5582f333a16f9d53e4f278168 */
 		
-		// TODO: date filter, limit
+		// Process filter requests: validate
+		if (isset($_POST['klga_start'])) {
+			if (preg_match("/\d{4}-\d{2}-\d{2}/", $_POST['klga_start']) !== 1) {
+				echo '<p>Invalid submission.</p>';
+				$_POST['klga_start'] = null;
+			}
+		}
+		if (isset($_POST['klga_end'])) {
+			if (preg_match("/\d{4}-\d{2}-\d{2}/", $_POST['klga_end']) !== 1) {
+				echo '<p>Invalid submission.</p>';
+				$_POST['klga_end'] = null;
+			}
+		}
+		if (isset($_POST['klga_start']) && isset($_POST['klga_end'])) {
+			if ($_POST['klga_start'] > $_POST['klga_end']) {
+				echo '<p>Start date after end date.</p>';
+				$_POST['klga_start'] = null;
+				$_POST['klga_end'] = null;
+			}
+		}
+		
+		// Show date and limit filters
+		// Set $_POSTs to current or default values
+		$_POST['klga_limit'] = isset($_POST['klga_limit'])?$_POST['klga_limit']:20;		
+		$today = getdate();
+		if (!isset($_POST['klga_start'])) {
+			$_POST['klga_start'] = $today['year'].'-'.sprintf("%02d",$today['mon']).'-'.'01';
+			$_POST['klga_end'] = null;
+		}
+		if (!isset($_POST['klga_end'])) {
+			$_POST['klga_end'] = $today['year'].'-'.sprintf("%02d",$today['mon']).'-'.sprintf("%02d",$today['mday']);
+		}
+				
+		echo '<form method = "post">';
+		echo 'Start: ';
+		echo '<input type = "text" name = "klga_start" value = "'.$_POST['klga_start'].'" size = "12" />';
+		echo ' End: ';
+		echo '<input type = "text" name = "klga_end" value = "'.$_POST['klga_end'].'" size = "12" />';
+		echo ' Limit: ';
+		echo '<input type = "number" name = "klga_limit" value = "'.$_POST['klga_limit'].'" size = "3" />';
+		echo '&nbsp;';
+		echo '<input type = "submit" name = "klga_submit" value = "submit" />';
+		echo '</form>';
 				
 		$analytics = array(
-			array ('metric' => "visits"), /* || "sessions" */
-			array ('metric' => "users"),
-			array ('metric' => "pageviews"),
-			array ('metric' => "avgSessionDuration"), /* in seconds, converts to H:i:s */
-			array ('metric' => "bounceRate"),
+			array ('metric' => "visits"), // || "sessions"
+			//array ('metric' => "users"),
+			//array ('metric' => "pageviews"),
+			//array ('metric' => "avgSessionDuration"), /* in seconds, converts to H:i:s */
+			//array ('metric' => "bounceRate"),
+			
+			array ('metric' => "pageviews", 'dimension' => 'source'), // 'dimension' => 'fullReferrer' gives full referrer URL 
+			/*
 			array ('metric' => "pageviews", 'dimension' => 'country'),
 			array ('metric' => "pageviews", 'dimension' => 'keyword'),
 			array ('metric' => "pageviews", 'dimension' => 'pagePath'),
+			* */
 		);
-				
+		
 		foreach ($analytics as $analytic) {
-			$response = self::getGA("2018-10-01", "2018-10-31",$analytic['metric'],isset($analytic['dimension'])?$analytic['dimension']:null);
+			$response = self::getGA($_POST['klga_start'], $_POST['klga_end'],(int) $_POST['klga_limit'],$analytic['metric'],isset($analytic['dimension'])?$analytic['dimension']:null);
 			echo '<h4>';
 			echo $analytic['metric'];
 			if (isset($analytic['dimension'])) { echo ' x '.$analytic['dimension']; }
