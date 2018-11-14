@@ -11,18 +11,19 @@ License: GPL2
 
 /* Link: https://github.com/googleapis/google-api-php-client */
 
-require_once(plugin_dir_path( __FILE__ ).'vendor/google-api-php-client/vendor/autoload.php');
-//require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor/autoload.php'); //?
+if (get_option('kl_ga_use_bundled_gaapi')) {
+	require_once(plugin_dir_path( __FILE__ ).'vendor/google-api-php-client/vendor/autoload.php');
+	//require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor/autoload.php'); //?
 
-/* HACK manual include required files ??  */
-/*
-require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor'.'/guzzlehttp/promises/src/functions_include.php');
-require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor'.'/guzzlehttp/psr7/src/functions_include.php');
-require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor'.'/guzzlehttp/guzzle/src/functions_include.php');
-require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor'.'/phpseclib/phpseclib/phpseclib/bootstrap.php');
--> Fatal error: Uncaught Error: Class 'Google_Client' not found
-*/
-
+	/* HACK manual include required files ??  */
+	/*
+	require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor'.'/guzzlehttp/promises/src/functions_include.php');
+	require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor'.'/guzzlehttp/psr7/src/functions_include.php');
+	require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor'.'/guzzlehttp/guzzle/src/functions_include.php');
+	require_once(__DIR__ .'/'.'vendor/google-api-php-client/vendor'.'/phpseclib/phpseclib/phpseclib/bootstrap.php');
+	-> Fatal error: Uncaught Error: Class 'Google_Client' not found
+	*/
+}
 
 require_once('kl-ga-adapter-options.php');
 

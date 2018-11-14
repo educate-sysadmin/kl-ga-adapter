@@ -34,11 +34,11 @@ function kl_ga_plugin_settings_page() {
     <table class="form-table">
             
 		<tr valign="top">
-        <th scope="row">ApplicationName</th>
+        <th scope="row">Use bundled GA API</th>
         <td>
-        	<input type="input" name="kl_ga_ApplicationName" value="<?php echo get_option('kl_ga_ApplicationName'); ?>" size="60" />
+        	<input type="checkbox" name="kl_ga_use_bundled_gaapi" <?php if (get_option('kl_ga_use_bundled_gaapi')) echo ' checked '; ?> size="60" />
         	<br/>
-        	<small>ApplicationName for GA API</small>
+        	<small>Try use bundled GA API files</small>
         </td>
         </tr>            
             
