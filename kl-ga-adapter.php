@@ -47,7 +47,6 @@ class KLGA {
 		$KEY_FILE_LOCATION = __DIR__ .'/';
 	  }
 	  $KEY_FILE_LOCATION .= get_option('kl_ga_DeveloperKeyFileLocation');	
-	  echo "=".  $KEY_FILE_LOCATION;	
 
 	  // Create and configure a new client object.
 	  $client = new Google_Client();
